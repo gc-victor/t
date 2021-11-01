@@ -20,6 +20,8 @@ const add = (ev) => {
     replace();
 }
 
+const arr = [0, 1, 2];
+
 const counter = () => {
     return t`
         <div id="app">
@@ -27,8 +29,11 @@ const counter = () => {
             <button onclick="${increment}">+</button>
             <input oninput="${add}" name="input" type="number" value="${count}" />
             ${t`<button onclick="${decrement}">-</button>`}
+            <ul>
+                ${arr.map((n) => t`<li>${n}</li>`)}
+            </ul>
         </div>
     `;
 };
 
-setTimeout(() => replace(), 2000);
+replace();

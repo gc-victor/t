@@ -1,10 +1,10 @@
 # T
 
-T is a micro-library (<800 B) to create DOM Trees using tagged templates.
+T is a micro-library (<900 B) to create DOM Trees using tagged templates.
 
 ## Key Features
 
-- Micro-library <800 B
+- Micro-library <900 B
 - Zero Dependencies
 - No compilation needed
 - Real DOM Tree

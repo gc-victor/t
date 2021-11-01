@@ -1,4 +1,4 @@
-import { isNodejs } from './is-nodejs.js';
+const isNodejs = typeof global !== 'undefined' && {}.toString.call(global) === '[object global]';
 
 function t(strings, ...args) {
     let result = '';
@@ -9,19 +9,22 @@ function t(strings, ...args) {
         const s = strings[i];
         const a = args[i];
         if (isNodejs) {
-            result += s + a;
+            result += s + (Array.isArray(a) ? a.join('') : a);
         } else {
             const isEvent = /on\w+="$/.test(s);
             const isFunction = typeof a === 'function';
             const nose = isEvent
-                ? s.replace(/on(\w+)="$/, `data-_on_="" data-_fn_${i}="${a}" data-_ev_${i}="$1" data-_arg_${i}="`)
+                ? s.replace(
+                      /on(\w+)="$/,
+                      `data-_on_="" data-_fn_${i}='${a}' data-_ev_${i}="$1" data-_arg_${i}="`
+                  )
                 : s;
             const tail = isFunction
                 ? isEvent
                     ? `${i}`
                     : a()
-                : a instanceof Element
-                    ? `<span data-_replace_='${i}'></span>`
+                : a instanceof Element || Array.isArray(a)
+                    ? `<script data-_replace_='${i}'></script>`
                     : a;
             result += nose + tail;
         }
@@ -34,8 +37,8 @@ function t(strings, ...args) {
         return result
             .replace(/\son\w+=".*?"/g, '')
             .replace(/\skey=".*?"/g, '')
-            .replace(/>[\r\n ]+</g, "><")
-            .replace(/(<.*?>)|\s+/g, (m, $1) => $1 ? $1 : ' ')
+            .replace(/>[\r\n ]+</g, '><')
+            .replace(/(<.*?>)|\s+/g, (m, $1) => ($1 ? $1 : ' '))
             .trim();
     }
 
@@ -48,7 +51,22 @@ function t(strings, ...args) {
     const elsToReplaceLength = elsToReplace.length;
     while (l < elsToReplaceLength) {
         const el = elsToReplace[l];
-        el.parentNode.replaceChild(args[el.getAttribute('data-_replace_')], el);
+        const replace = args[el.getAttribute('data-_replace_')];
+        if (Array.isArray(replace)) {
+            let ll = 0;
+            const elsToReplaceLengthLl = replace.length;
+            while (ll < elsToReplaceLengthLl) {
+                const ell =
+                    replace[ll] instanceof HTMLElement
+                        ? replace[ll]
+                        : document.createTextNode(replace[ll]);
+                el.parentNode.insertBefore(ell, el);
+                ll++;
+            }
+            el.parentNode.removeChild(el);
+        } else {
+            el.parentNode.replaceChild(replace, el);
+        }
         l++;
     }
 

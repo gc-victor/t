@@ -2,6 +2,7 @@ import { buildPage } from './build-page';
 import t from '../src';
 
 const tests = 0;
+const arr = [0, 1, 2];
 const fn = () => {};
 
 buildPage({
@@ -11,6 +12,9 @@ buildPage({
             <button onclick="${fn}">+</button>
             <input oninput="${fn}" name="input" type="number" value="${tests}" />
             <button onclick="${fn}">-</button>
+            <ul>
+                ${arr.map((n) => t`<li>${n}</li>`)}
+            </ul>
         </div>
     `,
     output: 'examples/counter.html',
