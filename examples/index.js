@@ -1,10 +1,10 @@
 import t from './src/index.js';
+import p from './p.js';
 
 let count = 0;
 
 const replace = () => {
-    const app = document.getElementById('app');
-    app.parentNode.replaceChild(counter(), app);
+    p(document.getElementById('app'), counter());
 }
 
 const increment = () => {

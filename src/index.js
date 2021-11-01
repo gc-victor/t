@@ -1,4 +1,5 @@
 const isNodejs = typeof global !== 'undefined' && {}.toString.call(global) === '[object global]';
+const events = {};
 
 function t(strings, ...args) {
     let result = '';
@@ -78,12 +79,12 @@ function t(strings, ...args) {
         Object.keys(els[j].dataset).forEach((data) => {
             if (/^_ev_/.test(data)) {
                 const index = data.replace('_ev_', '');
-                const event = el.getAttribute(`data-_ev_${index}`);
-                const listener = args[el.getAttribute(`data-_arg_${index}`)];
+                const type = el.getAttribute(`data-_ev_${index}`);
                 el.__key__ = el.getAttribute('key');
                 el.__handler__ = el.__handler__ || {};
-                el.__handler__[event] = listener;
-                el.addEventListener(event, listener);
+                el.__handler__[type] = args[el.getAttribute(`data-_arg_${index}`)];
+                !events[type] && document.addEventListener(type, handler);
+                events[type] = 1;
                 el.removeAttribute(`data-_on_`);
                 el.removeAttribute(`data-_fn_${index}`);
                 el.removeAttribute(`data-_arg_${index}`);
@@ -106,5 +107,18 @@ function t(strings, ...args) {
 
     return content.children[0];
 }
+
+const handler = (ev) => {
+    let el = ev.target;
+    const type = ev.type;
+    while (el !== null) {
+        const handler = el.__handler__ && el.__handler__[type];
+        if (handler) {
+            handler(ev);
+            return;
+        }
+        el = el.parentNode;
+    }
+};
 
 export default t;
