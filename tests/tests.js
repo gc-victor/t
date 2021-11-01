@@ -8,6 +8,7 @@ const dom = new JSDOM(`<!DOCTYPE html><body><div id="app"><p>Hello world!</p></d
 });
 window('window', dom.window);
 window('document', dom.window.document);
+global.Node = dom.window.Node
 
 const test = process.env.TEST ? tst : () => {};
 const ssr = !process.env.TEST ? tst : () => {};
@@ -77,6 +78,19 @@ test('should remove event and key attributes', () => {
     expect(el.getAttribute('key')).toBe(null);
     expect(el.getAttribute('oninput')).toBe(null);
     expect(el.getAttribute('onchange')).toBe(null);
+});
+
+test('should create a list of elements', () => {
+    const arr = [0,1,2];
+    replace(t`
+        <div id="app">
+            <ul>
+                ${arr.map((n) => t`<li>${n}</li>`)}
+            </ul>
+        </div>
+    `);
+
+    expect(document.querySelectorAll('li').length).toBe(3);
 });
 
 ssr('should print a minimize string with event and key attributes', () => {

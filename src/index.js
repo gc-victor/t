@@ -1,4 +1,4 @@
-const isNodejs = typeof global !== 'undefined' && {}.toString.call(global) === '[object global]';
+import { isNodejs } from './is-nodejs';
 const events = {};
 
 function t(strings, ...args) {
@@ -24,7 +24,7 @@ function t(strings, ...args) {
                 ? isEvent
                     ? `${i}`
                     : a()
-                : a instanceof Element || Array.isArray(a)
+                : a instanceof Node || Array.isArray(a)
                     ? `<script data-_replace_='${i}'></script>`
                     : a;
             result += nose + tail;
@@ -58,7 +58,7 @@ function t(strings, ...args) {
             const elsToReplaceLengthLl = replace.length;
             while (ll < elsToReplaceLengthLl) {
                 const ell =
-                    replace[ll] instanceof HTMLElement
+                    replace[ll] instanceof Node
                         ? replace[ll]
                         : document.createTextNode(replace[ll]);
                 el.parentNode.insertBefore(ell, el);
